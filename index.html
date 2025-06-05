@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tic-Tac-Toe.web</title>
+    <style>
+      :root {
+        /* Soothing, muted colors */
+        --primary-color: #90A4AE;         /* Soft blue-gray for primary buttons */
+        --primary-hover: #78909C;         /* Slightly darker for hover */
+        --border-color: #B0BEC5;          /* Light grey border for cells */
+        --win-bg: #DCEDC8;                /* Calm pastel green for winning cells */
+        --win-glow-start: #AED581;        /* Soft glow effect start */
+        --win-glow-end: #7CB342;          /* Soft glow effect end */
+        --reset-bg: #90A4AE;              /* Reset button background */
+        --reset-hover: #78909C;           /* Hover color for reset button */
+        --container-bg: #FAFAFA;          /* Very light grey container background */
+        --text-color: #455A64;            /* Dark blue-gray for cell text */
+      }
+
+      /* Basic reset and layout */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #f5f5f5;
+        font-family: Arial, sans-serif;
+        height: 100%;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+
+      /* Main container remains static */
+      .container {
+        position: relative;
+        width: 90%;
+        max-width: 450px;
+        padding: 15px;
+        background: var(--container-bg);
+        border-radius: 8px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        margin: 10px;
+        overflow: hidden;
+      }
+
+      h1 {
+        margin-bottom: 10px;
+        color: #333;
+        font-size: 1.5em;
+      }
+
+      /* Confetti container */
+      #confettiContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        overflow: visible;
+        z-index: 10;
+      }
+
+      /* Board size inputs */
+      .board-size {
+        margin-bottom: 10px;
+      }
+      .board-size label {
+        font-size: 0.9em;
+      }
+      .board-size input {
+        width: 50px;
+        padding: 5px;
+        margin: 0 5px;
+        text-align: center;
+      }
+
+      /* Mode buttons */
+      .modes {
+        margin-bottom: 10px;
+      }
+      .mode {
+        margin: 2px;
+        padding: 10px 12px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: background-color 0.3s;
+      }
+      .mode:hover {
+        background-color: var(--primary-hover);
+      }
+
+      /* Status message */
+      #status {
+        margin: 10px 0;
+        font-weight: bold;
+        min-height: 1.2em;
+        font-size: 1em;
+      }
+
+      /* Board container (static) */
+      #board {
+        display: grid;
+        gap: 5px;
+        margin: 15px auto;
+      }
+
+      /* Game cells */
+      .cell {
+        position: relative;
+        background: var(--container-bg);
+        border: 2px solid var(--border-color);
+        cursor: pointer;
+        user-select: none;
+        animation: fadeIn 0.5s ease-in-out;
+        height: 0;
+        padding-bottom: 100%;
+      }
+      .cell span {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 2em;
+        color: var(--text-color);
+      }
+      .cell.cell-filled span {
+        animation: pop 0.3s forwards;
+      }
+      @keyframes pop {
+        from {
+          transform: translate(-50%, -50%) scale(0.5);
+        }
+        to {
+          transform: translate(-50%, -50%) scale(1);
+        }
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.5);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      /* Winning cell highlight with soft glow */
+      .win {
+        background-color: var(--win-bg);
+        animation: glow 1s infinite alternate;
+      }
+      @keyframes glow {
+        from {
+          box-shadow: 0 0 10px var(--win-glow-start);
+        }
+        to {
+          box-shadow: 0 0 20px var(--win-glow-end);
+        }
+      }
+
+      /* Confetti element styling and animation */
+      .confetti {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        opacity: 0.9;
+        pointer-events: none;
+        animation: confettiFall linear forwards;
+      }
+      @keyframes confettiFall {
+        0% {
+          transform: translate(0, 0) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(var(--tx), var(--ty)) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      /* Restart button */
+      #reset {
+        margin-top: 10px;
+        padding: 10px 15px;
+        font-size: 1em;
+        border: none;
+        background-color: var(--reset-bg);
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      #reset:hover {
+        background-color: var(--reset-hover);
+      }
+
+      /* Footer branding */
+      footer {
+        margin-top: 10px;
+        font-size: 0.7em;
+        color: #777;
+      }
+
+      /* Mobile tweaks */
+      @media (max-width: 480px) {
+        h1 {
+          font-size: 1.3em;
+        }
+        .cell span {
+          font-size: 1.5em;
+        }
+        .mode {
+          padding: 8px 10px;
+          font-size: 0.85em;
+        }
+        #reset {
+          padding: 8px 12px;
+          font-size: 0.9em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Tic Tac Toe</h1>
+      <!-- Confetti container -->
+      <div id="confettiContainer"></div>
+      <!-- Board size settings -->
+      <div class="board-size">
+        <label for="rowsInput">Rows:</label>
+        <input type="number" id="rowsInput" min="3" max="5" value="3" />
+        <label for="colsInput">Columns:</label>
+        <input type="number" id="colsInput" min="3" max="5" value="3" />
+      </div>
+      <!-- Mode selection -->
+      <div class="modes">
+        <button class="mode" data-level="easy">Easy</button>
+        <button class="mode" data-level="medium">Medium</button>
+        <button class="mode" data-level="impossible">Impossible</button>
+        <button class="mode" data-level="friend">Play against a friend</button>
+      </div>
+      <!-- Status message -->
+      <div id="status">Select a mode and board size to start!</div>
+      <!-- Game board (generated dynamically) -->
+      <div id="board"></div>
+      <button id="reset">Restart Game</button>
+      <!-- Footer branding -->
+      <footer>
+        Developed by Toha
+      </footer>
+    </div>
+
+    <script>
+      // Global game state variables
+      let board = [];
+      let rows = 3,
+        cols = 3;
+      let winCount = 3;
+      let currentPlayer = "X";
+      let gameActive = false;
+      let mode = "";
+      let depthLimit = Infinity; // For minimax search on larger boards
+
+      const statusDisplay = document.getElementById("status");
+      const boardContainer = document.getElementById("board");
+      const rowsInput = document.getElementById("rowsInput");
+      const colsInput = document.getElementById("colsInput");
+      const confettiContainer = document.getElementById("confettiContainer");
+
+      // Mode button event listeners
+      document.querySelectorAll(".mode").forEach((button) => {
+        button.addEventListener("click", function () {
+          mode = this.getAttribute("data-level");
+          startGame();
+        });
+      });
+
+      // Reset game event
+      document.getElementById("reset").addEventListener("click", startGame);
+
+      // Start / restart the game
+      function startGame() {
+        rows = Math.min(Math.max(parseInt(rowsInput.value) || 3, 3), 5);
+        cols = Math.min(Math.max(parseInt(colsInput.value) || 3, 3), 5);
+
+        // For rectangular boards, use the smaller dimension as the win condition
+        if (rows === cols) {
+          winCount = (rows === 3) ? 3 : (rows === 4 ? 3 : 4);
+        } else {
+          winCount = Math.min(rows, cols);
+        }
+
+        depthLimit = rows * cols > 9 ? 4 : Infinity;
+        board = Array(rows * cols).fill("");
+        currentPlayer = "X";
+        gameActive = true;
+        updateStatus();
+        createBoard();
+        confettiContainer.innerHTML = "";
+      }
+
+      // Dynamically create the board grid
+      function createBoard() {
+        boardContainer.innerHTML = "";
+        boardContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+        for (let i = 0; i < rows * cols; i++) {
+          const cell = document.createElement("div");
+          cell.classList.add("cell");
+          cell.setAttribute("data-index", i);
+          cell.addEventListener("click", cellClick);
+          const span = document.createElement("span");
+          cell.appendChild(span);
+          boardContainer.appendChild(cell);
+        }
+      }
+
+      // Handle a cell click
+      function cellClick() {
+        const index = parseInt(this.getAttribute("data-index"));
+        if (!gameActive || board[index] !== "") return;
+        makeMove(index, currentPlayer);
+        // If playing against the computer, let it move after a brief pause
+        if (gameActive && mode !== "friend") {
+          setTimeout(() => {
+            const move = getComputerMove(mode);
+            if (move !== null) {
+              makeMove(move, "O");
+            }
+          }, 300);
+        }
+      }
+
+      // Execute a move for a given player
+      function makeMove(index, player) {
+        board[index] = player;
+        const cell = boardContainer.querySelector(`.cell[data-index="${index}"]`);
+        cell.firstElementChild.textContent = player;
+        cell.classList.add("cell-filled");
+
+        const winLine = checkWinForPlayer(player);
+        if (winLine) {
+          highlightWinningCells(winLine);
+          statusDisplay.textContent = player + " wins!";
+          gameActive = false;
+          launchConfetti();
+          return;
+        }
+
+        if (board.every((cellVal) => cellVal !== "")) {
+          statusDisplay.textContent = "Draw!";
+          gameActive = false;
+          return;
+        }
+
+        if (mode === "friend") {
+          currentPlayer = currentPlayer === "X" ? "O" : "X";
+          statusDisplay.textContent = currentPlayer + "'s turn";
+        }
+      }
+
+      // Update the status message (and note if board is rectangular)
+      function updateStatus() {
+        let baseStatus;
+        if (mode === "friend") {
+          baseStatus = "Friend mode: X's turn";
+        } else if (mode) {
+          baseStatus = `Playing vs ${mode.toUpperCase()} computer. Your turn!`;
+        } else {
+          baseStatus = "Select a mode and board size to start!";
+        }
+        if (rows !== cols) {
+          baseStatus += " (Rectangular board: " + winCount + " in a row to win)";
+        }
+        statusDisplay.textContent = baseStatus;
+      }
+
+      // Check all directions for a winning line for the given player
+      function checkWinForPlayer(player) {
+        const directions = [
+          { dr: 0, dc: 1 },
+          { dr: 1, dc: 0 },
+          { dr: 1, dc: 1 },
+          { dr: 1, dc: -1 },
+        ];
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            if (board[r * cols + c] === player) {
+              for (let { dr, dc } of directions) {
+                let line = [];
+                let valid = true;
+                for (let k = 0; k < winCount; k++) {
+                  let nr = r + dr * k;
+                  let nc = c + dc * k;
+                  if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) {
+                    valid = false;
+                    break;
+                  }
+                  if (board[nr * cols + nc] !== player) {
+                    valid = false;
+                    break;
+                  }
+                  line.push(nr * cols + nc);
+                }
+                if (valid) return line;
+              }
+            }
+          }
+        }
+        return null;
+      }
+
+      // Highlight winning cells with a soft glow effect
+      function highlightWinningCells(winLine) {
+        winLine.forEach((index) => {
+          const cell = boardContainer.querySelector(`.cell[data-index="${index}"]`);
+          cell.classList.add("win");
+        });
+      }
+
+      // Return an array of indices for empty cells
+      function getAvailableMoves() {
+        return board
+          .map((v, i) => (v === "" ? i : null))
+          .filter((v) => v !== null);
+      }
+
+      // Choose a computer move based on the given difficulty
+      function getComputerMove(difficulty) {
+        const available = getAvailableMoves();
+        if (available.length === 0) return null;
+        if (difficulty === "easy") {
+          return available[Math.floor(Math.random() * available.length)];
+        } else if (difficulty === "medium") {
+          for (let move of available) {
+            board[move] = "O";
+            if (checkWinForPlayer("O")) {
+              board[move] = "";
+              return move;
+            }
+            board[move] = "";
+          }
+          for (let move of available) {
+            board[move] = "X";
+            if (checkWinForPlayer("X")) {
+              board[move] = "";
+              return move;
+            }
+            board[move] = "";
+          }
+          return available[Math.floor(Math.random() * available.length)];
+        } else if (difficulty === "impossible") {
+          return minimaxMove();
+        }
+      }
+
+      // Use minimax to determine the best move (depth-limited for larger boards)
+      function minimaxMove() {
+        let bestScore = -Infinity;
+        let bestMove = null;
+        for (let i = 0; i < board.length; i++) {
+          if (board[i] === "") {
+            board[i] = "O";
+            let score = minimax(board, 0, false);
+            board[i] = "";
+            if (score > bestScore) {
+              bestScore = score;
+              bestMove = i;
+            }
+          }
+        }
+        return bestMove;
+      }
+      function minimax(newBoard, depth, isMaximizing) {
+        let score = evaluateBoard(newBoard);
+        if (score !== null || depth === depthLimit) {
+          return score !== null ? score : 0;
+        }
+        if (isMaximizing) {
+          let best = -Infinity;
+          for (let i = 0; i < newBoard.length; i++) {
+            if (newBoard[i] === "") {
+              newBoard[i] = "O";
+              best = Math.max(best, minimax(newBoard, depth + 1, false));
+              newBoard[i] = "";
+            }
+          }
+          return best;
+        } else {
+          let best = Infinity;
+          for (let i = 0; i < newBoard.length; i++) {
+            if (newBoard[i] === "") {
+              newBoard[i] = "X";
+              best = Math.min(best, minimax(newBoard, depth + 1, true));
+              newBoard[i] = "";
+            }
+          }
+          return best;
+        }
+      }
+      function evaluateBoard(currentBoard) {
+        if (checkWinForPlayer("O")) return 10;
+        else if (checkWinForPlayer("X")) return -10;
+        else if (currentBoard.every((cell) => cell !== "")) return 0;
+        return null;
+      }
+
+      // Launch a confetti burst using a pastel comfort palette
+      function launchConfetti() {
+        const colors = [
+          "#B3E5FC",
+          "#B2DFDB",
+          "#F1F8E9",
+          "#FFECB3",
+          "#FFE0B2",
+          "#D1C4E9",
+        ];
+        const confettiCount = 30;
+        for (let i = 0; i < confettiCount; i++) {
+          const confetti = document.createElement("div");
+          confetti.classList.add("confetti");
+          confetti.style.left = Math.random() * 100 + "%";
+          confetti.style.top = Math.random() * 20 + "px";
+          confetti.style.backgroundColor =
+            colors[Math.floor(Math.random() * colors.length)];
+          const tx = (Math.random() * 100 - 50) + "px";
+          const ty = (Math.random() * 150 + 150) + "px";
+          confetti.style.setProperty("--tx", tx);
+          confetti.style.setProperty("--ty", ty);
+          const duration = Math.random() * 0.5 + 1.0;
+          confetti.style.animationDuration = duration + "s";
+          confetti.style.animationDelay = Math.random() * 0.3 + "s";
+          confettiContainer.appendChild(confetti);
+        }
+        setTimeout(() => {
+          confettiContainer.innerHTML = "";
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>
