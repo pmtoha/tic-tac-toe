@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#e0f7fa" id="metaTheme" />
+  <title>Tic Tac Toe</title>
+
+</head>
+<body>
+  <main class="game">
+    <div class="top">
+      <h1>Tic Tac Toe</h1>
+      <div class="toggles">
+        <button id="soundToggle" class="icon-btn" title="Sound">🔊</button>
+        <button id="themeToggle" class="icon-btn" title="Theme">🌙</button>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="seg" id="sizeSeg">
+        <button class="seg-btn active" data-size="3">3×3</button>
+        <button class="seg-btn" data-size="4">4×4</button>
+      </div>
+      <div class="modes">
+        <button class="mode" data-level="easy">Easy</button>
+        <button class="mode active" data-level="medium">Medium</button>
+        <button class="mode" data-level="impossible">Impossible</button>
+        <button class="mode" data-level="friend">2 Player</button>
+      </div>
+    </div>
+
+    <div class="scoreboard" id="scoreboard" title="Double-click to reset">
+      <div class="score x"><b id="scoreX">0</b><small id="xLabel">You ✕</small></div>
+      <div class="score"><b id="scoreD">0</b><small>Draws</small></div>
+      <div class="score o"><b id="scoreO">0</b><small id="oLabel">CPU ◯</small></div>
+    </div>
+
+    <div class="status"><span class="dot x" id="dot"></span><span id="statusText">Loading…</span></div>
+
+    <div class="board-wrap">
+      <div id="board" data-turn="X" role="grid" aria-label="Board"></div>
+      <svg id="winLine" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+    </div>
+
+    <button id="restart" class="btn">↻ Restart</button>
+    <footer>Made by <b>Toha</b></footer>
+  </main>
+
+  <div id="confetti"></div>
+
+  <div id="overlay" class="overlay">
+    <div class="overlay-card">
+      <p id="endMessage"></p>
+      <div class="row">
+        <button id="playAgain" class="btn">Play Again</button>
+        <button id="closeOverlay" class="btn ghost">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <noscript><p style="text-align:center">This game needs JavaScript.</p></noscript>
+    <link rel="stylesheet" href="main.css" />
+    <script src="script.js"></script>
+</body>
+</html>

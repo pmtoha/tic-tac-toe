@@ -2,494 +2,65 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tic-Tac-Toe.web</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600&display=swap"
-    rel="stylesheet"
-  />
-  <style>
-    :root {
-      --primary-color: #00bcd4;
-      --primary-hover: #00acc1;
-      --bg-gradient: linear-gradient(135deg, #eceff1, #cfd8dc);
-      --board-bg: #ffffff;
-      --cell-border: #cfd8dc;
-      --win-bg: #c8e6c9;
-      --text-color: #263238;
-      --shadow: 0 10px 20px rgba(0,0,0,0.1);
-      --font-main: 'Rubik', sans-serif;
-    }
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#e0f7fa" id="metaTheme" />
+  <title>Tic Tac Toe</title>
 
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0; padding: 0;
-      font-family: var(--font-main);
-      background: var(--bg-gradient);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
-
-    .container {
-      background: var(--board-bg);
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      text-align: center;
-      width: 95%;
-      max-width: 500px;
-      animation: fadeIn 0.5s ease-out;
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    .container.game-over {
-      background: #f1f8e9;
-      box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
-      transform: scale(1.02);
-    }
-
-    h1 {
-      font-size: 2em;
-      margin-bottom: 10px;
-      color: var(--primary-color);
-      font-weight: 600;
-    }
-
-    .board-size, .modes {
-      margin: 10px 0;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    label {
-      font-size: 1em;
-      color: var(--text-color);
-    }
-
-    input[type="number"] {
-      width: 50px;
-      text-align: center;
-      padding: 6px;
-      border: 1px solid var(--cell-border);
-      border-radius: 5px;
-    }
-
-    .mode {
-      padding: 10px 15px;
-      background-color: var(--primary-color);
-      border: none;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.9em;
-      transition: background 0.3s, transform 0.2s;
-    }
-    .mode:hover {
-      background-color: var(--primary-hover);
-      transform: scale(1.05);
-    }
-
-    #status {
-      font-weight: bold;
-      margin: 15px 0;
-      color: var(--text-color);
-      min-height: 1.5em;
-      font-size: 1em;
-    }
-
-    #board {
-      display: grid;
-      gap: 6px;
-      margin: 15px auto;
-      width: 100%;
-      max-width: 400px;
-      aspect-ratio: 1/1;
-    }
-
-    .cell {
-      position: relative;
-      background: #fafafa;
-      border: 2px solid var(--cell-border);
-      border-radius: 12px;
-      cursor: pointer;
-      width: 100%;
-      aspect-ratio: 1/1;
-      transition: background 0.2s;
-    }
-
-    .cell span {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      font-size: 2.2em;
-      animation: popIn 0.4s forwards;
-    }
-    .cell-filled span {
-      animation: popIn 0.4s forwards;
-    }
-    @keyframes popIn {
-      from { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
-      to   { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
-    }
-
-    .win {
-      background-color: var(--win-bg) !important;
-      box-shadow: 0 0 15px #66bb6a;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to   { opacity: 1; transform: scale(1); }
-    }
-
-    /* Play Again overlay */
-    .overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      z-index: 20;
-    }
-    .overlay.show {
-      opacity: 1; pointer-events: all;
-    }
-    .overlay-content {
-      background: var(--board-bg);
-      padding: 20px;
-      border-radius: 16px;
-      text-align: center;
-      box-shadow: var(--shadow);
-    }
-
-    .play-again {
-      margin-top: 15px;
-      padding: 10px 25px;
-      font-size: 1em;
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
-    }
-    .play-again:hover {
-      background-color: var(--primary-hover);
-      transform: scale(1.05);
-    }
-
-    footer {
-      margin-top: 12px;
-      font-size: 0.75em;
-      color: #78909C;
-    }
-
-    #confettiContainer {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      pointer-events: none;
-      z-index: 10;
-    }
-    .confetti {
-      position: absolute;
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      animation: confettiDrop linear forwards;
-      opacity: 0.9;
-    }
-    @keyframes confettiDrop {
-      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(200px) rotate(360deg); opacity: 0; }
-    }
-
-    @media (max-width: 500px) {
-      .mode { flex: 1 0 45%; }
-    }
-  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Tic Tac Toe</h1>
-    <div id="confettiContainer"></div>
-
-    <div class="board-size">
-      <label for="rowsInput">Rows:</label>
-      <input type="number" id="rowsInput" min="3" max="5" value="3" />
-      <label for="colsInput">Columns:</label>
-      <input type="number" id="colsInput" min="3" max="5" value="3" />
+  <main class="game">
+    <div class="top">
+      <h1>Tic Tac Toe</h1>
+      <div class="toggles">
+        <button id="soundToggle" class="icon-btn" title="Sound">🔊</button>
+        <button id="themeToggle" class="icon-btn" title="Theme">🌙</button>
+      </div>
     </div>
 
-    <div class="modes">
-      <button class="mode" data-level="easy">Easy</button>
-      <button class="mode" data-level="medium">Medium</button>
-      <button class="mode" data-level="impossible">Impossible</button>
-      <button class="mode" data-level="friend">2 Player</button>
+    <div class="controls">
+      <div class="seg" id="sizeSeg">
+        <button class="seg-btn active" data-size="3">3×3</button>
+        <button class="seg-btn" data-size="4">4×4</button>
+      </div>
+      <div class="modes">
+        <button class="mode" data-level="easy">Easy</button>
+        <button class="mode active" data-level="medium">Medium</button>
+        <button class="mode" data-level="impossible">Impossible</button>
+        <button class="mode" data-level="friend">2 Player</button>
+      </div>
     </div>
 
-    <div id="status">Choose a mode to begin</div>
-    <div id="board"></div>
+    <div class="scoreboard" id="scoreboard" title="Double-click to reset">
+      <div class="score x"><b id="scoreX">0</b><small id="xLabel">You ✕</small></div>
+      <div class="score"><b id="scoreD">0</b><small>Draws</small></div>
+      <div class="score o"><b id="scoreO">0</b><small id="oLabel">CPU ◯</small></div>
+    </div>
 
-    <!-- Always-visible Restart button -->
-    <button id="restart" class="play-again">Restart</button>
+    <div class="status"><span class="dot x" id="dot"></span><span id="statusText">Loading…</span></div>
 
-    <footer>Made by Toha — AIT Inc Ltd</footer>
+    <div class="board-wrap">
+      <div id="board" data-turn="X" role="grid" aria-label="Board"></div>
+      <svg id="winLine" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+    </div>
 
-    <!-- Overlay for Play Again -->
-    <div id="overlay" class="overlay">
-      <div class="overlay-content">
-        <div id="endMessage"></div>
-        <button id="playAgain" class="play-again">Play Again</button>
+    <button id="restart" class="btn">↻ Restart</button>
+    <footer>Made by <b>Toha</b></footer>
+  </main>
+
+  <div id="confetti"></div>
+
+  <div id="overlay" class="overlay">
+    <div class="overlay-card">
+      <p id="endMessage"></p>
+      <div class="row">
+        <button id="playAgain" class="btn">Play Again</button>
+        <button id="closeOverlay" class="btn ghost">Close</button>
       </div>
     </div>
   </div>
 
-  <script>
-    let board = [];
-    let rows = 3, cols = 3, winCount = 3;
-    let currentPlayer = 'X', gameActive = false, mode = '';
-    let depthLimit = Infinity;
-
-    const boardContainer   = document.getElementById('board');
-    const statusDisplay    = document.getElementById('status');
-    const confettiContainer= document.getElementById('confettiContainer');
-    const rowsInput        = document.getElementById('rowsInput');
-    const colsInput        = document.getElementById('colsInput');
-    const container        = document.querySelector('.container');
-    const overlay          = document.getElementById('overlay');
-    const endMessage       = document.getElementById('endMessage');
-    const playAgainBtn     = document.getElementById('playAgain');
-    const restartBtn       = document.getElementById('restart');
-
-    // Mode buttons
-    document.querySelectorAll('.mode').forEach(btn => {
-      btn.addEventListener('click', () => {
-        mode = btn.dataset.level;
-        startGame();
-      });
-    });
-
-    // Always-visible Restart
-    restartBtn.addEventListener('click', () => {
-      overlay.classList.remove('show');
-      startGame();
-    });
-
-    // Play Again inside overlay
-    playAgainBtn.addEventListener('click', () => {
-      overlay.classList.remove('show');
-      startGame();
-    });
-
-    // Initialize or restart
-    function startGame() {
-      rows = Math.max(3, Math.min(+rowsInput.value, 5));
-      cols = Math.max(3, Math.min(+colsInput.value, 5));
-      winCount = rows === cols
-        ? (rows === 4 ? 3 : rows)
-        : Math.min(rows, cols);
-      depthLimit = rows * cols > 9 ? 4 : Infinity;
-
-      board = Array(rows * cols).fill('');
-      currentPlayer = 'X';
-      gameActive = true;
-
-      updateStatus();
-      renderBoard();
-      confettiContainer.innerHTML = '';
-      container.classList.remove('game-over');
-      overlay.classList.remove('show');
-    }
-
-    function renderBoard() {
-      boardContainer.innerHTML = '';
-      boardContainer.style.gridTemplateColumns = `repeat(${cols},1fr)`;
-      board.forEach((_, i) => {
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        cell.dataset.index = i;
-        cell.addEventListener('click', onCellClick);
-        cell.appendChild(document.createElement('span'));
-        boardContainer.appendChild(cell);
-      });
-    }
-
-    function onCellClick() {
-      const idx = +this.dataset.index;
-      if (!gameActive || board[idx]) return;
-      makeMove(idx, currentPlayer);
-      if (gameActive && mode !== 'friend') {
-        setTimeout(() => {
-          const ai = getComputerMove(mode);
-          if (ai !== null) makeMove(ai, 'O');
-        }, 300);
-      }
-    }
-
-    function makeMove(idx, player) {
-      board[idx] = player;
-      const cell = boardContainer.querySelector(`.cell[data-index="${idx}"]`);
-      cell.querySelector('span').textContent = player === 'X' ? '❌' : '⭕';
-      cell.classList.add('cell-filled');
-
-      const winLine = checkWinForPlayer(player);
-      if (winLine) {
-        highlightWin(winLine);
-        finishGame(`${player === 'X' ? '❌' : '⭕'} wins! 🎉`);
-      }
-      else if (board.every(v => v)) {
-        finishGame('Draw! 🤝');
-      }
-      else {
-        currentPlayer = player === 'X' ? 'O' : 'X';
-        if (mode === 'friend') {
-          statusDisplay.textContent = `${currentPlayer === 'X' ? '❌' : '⭕'}'s turn`;
-        }
-      }
-    }
-
-    function finishGame(msg) {
-      statusDisplay.textContent = msg;
-      gameActive = false;
-      container.classList.add('game-over');
-      showConfetti();
-      endMessage.textContent = msg;
-      overlay.classList.add('show');
-    }
-
-    function updateStatus() {
-      let text = mode === 'friend'
-        ? "2 Player Mode: ❌'s Turn"
-        : mode
-          ? `Playing ${mode.toUpperCase()} AI: Your Move!`
-          : "Choose a mode to begin";
-      if (rows !== cols) text += ` (${winCount} in a row to win)`;
-      statusDisplay.textContent = text;
-    }
-
-    function checkWinForPlayer(player) {
-      const dirs = [{r:0,c:1},{r:1,c:0},{r:1,c:1},{r:1,c:-1}];
-      for (let r=0; r<rows; r++) {
-        for (let c=0; c<cols; c++) {
-          const i = r*cols + c;
-          if (board[i] !== player) continue;
-          for (let {r:dr,c:dc} of dirs) {
-            const seq = [];
-            let ok = true;
-            for (let k=0; k<winCount; k++) {
-              const nr = r + dr*k, nc = c + dc*k;
-              if (nr<0||nc<0||nr>=rows||nc>=cols||board[nr*cols+nc]!==player) {
-                ok = false; break;
-              }
-              seq.push(nr*cols + nc);
-            }
-            if (ok) return seq;
-          }
-        }
-      }
-      return null;
-    }
-
-    function highlightWin(line) {
-      line.forEach(i => {
-        boardContainer.querySelector(`.cell[data-index="${i}"]`)
-          .classList.add('win');
-      });
-    }
-
-    function getAvailableMoves() {
-      return board
-        .map((v,i) => v === '' ? i : null)
-        .filter(i => i !== null);
-    }
-
-    function getComputerMove(level) {
-      const moves = getAvailableMoves();
-      if (!moves.length) return null;
-      if (level === 'easy') {
-        return moves[Math.floor(Math.random() * moves.length)];
-      }
-      if (level === 'medium') {
-        // Win if possible
-        for (let m of moves) {
-          board[m] = 'O';
-          if (checkWinForPlayer('O')) { board[m] = ''; return m; }
-          board[m] = '';
-        }
-        // Block
-        for (let m of moves) {
-          board[m] = 'X';
-          if (checkWinForPlayer('X')) { board[m] = ''; return m; }
-          board[m] = '';
-        }
-        return moves[Math.floor(Math.random() * moves.length)];
-      }
-      return minimaxMove();
-    }
-
-    function minimaxMove() {
-      let best = -Infinity, choice = null;
-      getAvailableMoves().forEach(i => {
-        board[i] = 'O';
-        const val = minimax(0, false);
-        board[i] = '';
-        if (val > best) { best = val; choice = i; }
-      });
-      return choice;
-    }
-
-    function minimax(depth, isMax) {
-      const evalScore = evaluateBoard();
-      if (evalScore !== null || depth >= depthLimit) {
-        return evalScore ?? 0;
-      }
-      const moves = getAvailableMoves();
-      let best = isMax ? -Infinity : Infinity;
-      for (let m of moves) {
-        board[m] = isMax ? 'O' : 'X';
-        const val = minimax(depth + 1, !isMax);
-        board[m] = '';
-        best = isMax ? Math.max(best, val) : Math.min(best, val);
-      }
-      return best;
-    }
-
-    function evaluateBoard() {
-      if (checkWinForPlayer('O')) return 10;
-      if (checkWinForPlayer('X')) return -10;
-      if (board.every(c => c !== '')) return 0;
-      return null;
-    }
-
-    function showConfetti() {
-      const colors = ['#80deea','#ffccbc','#ffe082','#d1c4e9','#c5e1a5'];
-      for (let i=0; i<30; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'confetti';
-        dot.style.left = Math.random()*100 + '%';
-        dot.style.top  = '-20px';
-        dot.style.backgroundColor = colors[
-          Math.floor(Math.random()*colors.length)
-        ];
-        dot.style.animationDuration = `${Math.random()*0.5 + 1.2}s`;
-        dot.style.animationDelay    = `${Math.random()*0.5}s`;
-        confettiContainer.appendChild(dot);
-      }
-      setTimeout(() => {
-        confettiContainer.innerHTML = '';
-      }, 2500);
-    }
-
-    // Launch initial board
-    startGame();
-  </script>
+  <noscript><p style="text-align:center">This game needs JavaScript.</p></noscript>
+    <link rel="stylesheet" href="main.css" />
+    <script src="script.js"></script>
 </body>
 </html>

@@ -1,0 +1,206 @@
+
+    :root {
+      --primary-color: #00bcd4;
+      --primary-hover: #00acc1;
+      --bg-gradient: linear-gradient(135deg, #eceff1, #cfd8dc);
+      --board-bg: #ffffff;
+      --cell-border: #cfd8dc;
+      --win-bg: #c8e6c9;
+      --text-color: #263238;
+      --shadow: 0 10px 20px rgba(0,0,0,0.1);
+      --font-main: 'Rubik', sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      font-family: var(--font-main);
+      background: var(--bg-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: var(--board-bg);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      width: 95%;
+      max-width: 500px;
+      animation: fadeIn 0.5s ease-out;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .container.game-over {
+      background: #f1f8e9;
+      box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+      transform: scale(1.02);
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    .board-size, .modes {
+      margin: 10px 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    label {
+      font-size: 1em;
+      color: var(--text-color);
+    }
+
+    input[type="number"] {
+      width: 50px;
+      text-align: center;
+      padding: 6px;
+      border: 1px solid var(--cell-border);
+      border-radius: 5px;
+    }
+
+    .mode {
+      padding: 10px 15px;
+      background-color: var(--primary-color);
+      border: none;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .mode:hover {
+      background-color: var(--primary-hover);
+      transform: scale(1.05);
+    }
+
+    #status {
+      font-weight: bold;
+      margin: 15px 0;
+      color: var(--text-color);
+      min-height: 1.5em;
+      font-size: 1em;
+    }
+
+    #board {
+      display: grid;
+      gap: 6px;
+      margin: 15px auto;
+      width: 100%;
+      max-width: 400px;
+      aspect-ratio: 1/1;
+    }
+
+    .cell {
+      position: relative;
+      background: #fafafa;
+      border: 2px solid var(--cell-border);
+      border-radius: 12px;
+      cursor: pointer;
+      width: 100%;
+      aspect-ratio: 1/1;
+      transition: background 0.2s;
+    }
+
+    .cell span {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      font-size: 2.2em;
+      animation: popIn 0.4s forwards;
+    }
+    .cell-filled span {
+      animation: popIn 0.4s forwards;
+    }
+    @keyframes popIn {
+      from { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+      to   { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
+    }
+
+    .win {
+      background-color: var(--win-bg) !important;
+      box-shadow: 0 0 15px #66bb6a;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* Play Again overlay */
+    .overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 20;
+    }
+    .overlay.show {
+      opacity: 1; pointer-events: all;
+    }
+    .overlay-content {
+      background: var(--board-bg);
+      padding: 20px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .play-again {
+      margin-top: 15px;
+      padding: 10px 25px;
+      font-size: 1em;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .play-again:hover {
+      background-color: var(--primary-hover);
+      transform: scale(1.05);
+    }
+
+    footer {
+      margin-top: 12px;
+      font-size: 0.75em;
+      color: #78909C;
+    }
+
+    #confettiContainer {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .confetti {
+      position: absolute;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      animation: confettiDrop linear forwards;
+      opacity: 0.9;
+    }
+    @keyframes confettiDrop {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(200px) rotate(360deg); opacity: 0; }
+    }
+
+    @media (max-width: 500px) {
+      .mode { flex: 1 0 45%; }
+    }
